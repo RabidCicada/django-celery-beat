@@ -12,7 +12,7 @@ from celery import schedules
 from celery.five import python_2_unicode_compatible
 
 from . import managers
-from .utils import now
+from .utils import now, make_aware
 
 DAYS = 'days'
 HOURS = 'hours'
@@ -167,11 +167,12 @@ class CrontabSchedule(models.Model):
 
     @property
     def schedule(self):
+        nf = lambda: make_aware(now())
         return schedules.crontab(minute=self.minute,
                                  hour=self.hour,
                                  day_of_week=self.day_of_week,
                                  day_of_month=self.day_of_month,
-                                 month_of_year=self.month_of_year)
+                                 month_of_year=self.month_of_year, nowfun=nf)
 
     @classmethod
     def from_schedule(cls, schedule):
